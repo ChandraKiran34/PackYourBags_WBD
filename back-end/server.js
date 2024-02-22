@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 import authRoutes from './routes/TravellerAuthenticate.js';
 import guideRoutes  from './routes/GuideAuthenticate.js';
@@ -39,7 +40,12 @@ app.use('/agency',agencyRoutes);
 app.use('/destinations',destinationRoutes);
 app.use('/trips', tripRoutes);
 
-
+// Create a write stream for logging
+const accessLogFile = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+accessLogFile.on('error', (err) => {
+  console.error('Error creating write stream:', err);
+});
+app.use(morgan('combined', { stream: accessLogFile }));
 
 const PORT = process.env.PORT || 9000;
 
